@@ -1,0 +1,100 @@
+const addBtn = document.getElementById("addBtn");
+const messageInput = document.getElementById("message");
+const priorityInput = document.getElementById("priority");
+const output = document.getElementById("output");
+
+// 알림 저장 배열
+let notifications = [];
+
+// 알림 발생 버튼
+addBtn.addEventListener("click", addNotification);
+
+// 알림 추가 함수
+function addNotification() {
+
+    const message = messageInput.value.trim();
+    const priority = priorityInput.value;
+
+    if (message === "") {
+        alert("알림 내용을 입력하세요.");
+        return;
+    }
+
+    const notification = {
+        message: message,
+        priority: priority,
+        time: new Date().toLocaleTimeString()
+    };
+
+    // 긴급 알림이면 즉시 출력
+    if (priority === "high") {
+
+        showImmediateNotification(notification);
+
+    } else {
+
+        // 일반 알림은 배열에 저장
+        notifications.push(notification);
+
+        console.log("알림 누적 중...");
+        console.log(notifications);
+    }
+
+    // 입력 초기화
+    messageInput.value = "";
+}
+
+// 긴급 알림 출력
+function showImmediateNotification(notification) {
+
+    const box = document.createElement("div");
+
+    box.classList.add("notification-box");
+    box.classList.add("high");
+
+    box.innerHTML = `
+        <strong>🚨 긴급 알림</strong><br>
+        ${notification.message}
+        <div class="time">${notification.time}</div>
+    `;
+
+    output.prepend(box);
+}
+
+// 일반 알림 묶음 출력 함수
+function showBundledNotifications() {
+
+    // 알림이 없으면 종료
+    if (notifications.length === 0) {
+        return;
+    }
+
+    const box = document.createElement("div");
+
+    box.classList.add("notification-box");
+
+    let html = `
+        <strong>📦 묶음 알림 (${notifications.length}개)</strong><br><br>
+    `;
+
+    notifications.forEach((n, index) => {
+
+        html += `
+            ${index + 1}. ${n.message}
+            <div class="time">${n.time}</div>
+            <hr>
+        `;
+    });
+
+    box.innerHTML = html;
+
+    output.prepend(box);
+
+    // 출력 후 초기화
+    notifications = [];
+
+    console.log("알림 초기화 완료");
+}
+
+// 10초마다 묶음 출력
+setInterval(showBundledNotifications, 10000);
